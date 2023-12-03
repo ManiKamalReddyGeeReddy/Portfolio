@@ -1,0 +1,76 @@
+#### Linear Regression
+
+Linear Regression is used to find the relationship between the two variables. This relationship is derived from the straight line drawn from the data points. This line is used to predict the future outcomes.
+
+Here we are going to implement linear regression for the data set.
+
+First we need to load the dataset.
+
+```{r}
+library(tidyr)
+cars <- read.csv("C:/Users/manik/Downloads/cars.csv")
+```
+
+After reading the dataset now check the dataset on the strurcture of the data.
+
+```{r}
+summary(cars)
+```
+
+Find the missing values in the dataset using na() function.
+
+```{r}
+sum(is.na(cars))
+```
+
+So there are no null values in the data set. Next we need to divide the data set into train and test dataset.
+
+```{r}
+library(caret)
+set.seed(123)
+splitIndex <- createDataPartition(cars$Retail, p = .80, list = FALSE, times = 1)
+trainData <- cars[splitIndex,]
+testData <- cars[-splitIndex,]
+```
+
+Now we need to create the model.
+
+```{r}
+model <- lm(Retail ~ Horsepower + CityMPG + HighwayMPG, data = trainData)
+model
+```
+
+Prediction on the test data
+
+```{r}
+predictions <- predict(model, testData)
+predictions
+```
+
+To evaluate the performance we need to calculate root mean square error (RSME)
+
+```{r}
+library(Metrics)
+rmse <- rmse(testData$Retail, predictions)
+rmse
+```
+
+```{r}
+r2 <- cor(testData$Retail, predictions)^2
+r2
+```
+
+To plot the graph for the above concept
+
+```{r}
+plot(testData$Retail, predictions, main = "Actual vs Predicted Retail Prices", xlab = "Actual Prices", ylab = "Predicted Prices")
+abline(a = 0, b = 1, col = "red") # Adds a 45-degree line
+
+# Plotting Residuals
+residuals <- testData$Retail - predictions
+plot(residuals, main = "Residuals of the Model", xlab = "Index", ylab = "Residual")
+abline(h = 0, col = "red") # Adds a horizontal line at 0
+
+# Optional: Histogram of Residuals
+hist(residuals, main = "Histogram of Residuals", xlab = "Residual", breaks = 30)
+```
